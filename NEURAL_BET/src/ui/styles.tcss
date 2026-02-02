@@ -1,92 +1,154 @@
-/* Cyberpunk / Trader Dark Theme */
+/* src/ui/styles.tcss */
+
+/* --- PALETTE & THÈME GLOBAL --- */
+$bg-main: #090909;
+$bg-surface: #1E1E1E;
+$accent: #FF8C00;
+$text-main: #EEEEEE;
+$text-dim: #666666;
+$border-color: #333333;
 
 Screen {
-    background: #0d1117;
-    color: #c9d1d9;
+    background: $bg-main;
+    color: $text-main;
 }
 
-Header {
-    dock: top;
-    height: 3;
-    background: #161b22;
-    color: #58a6ff;
-    border-bottom: solid #30363d;
-}
-
-Footer {
-    dock: bottom;
-    height: 1;
-    background: #161b22;
-    color: #8b949e;
-}
-
-/* --- Layouts --- */
-
-#main_layout {
-    layout: grid;
-    grid-size: 2;
-    grid-columns: 2fr 1fr; /* 66% Analysis, 33% Market/Status */
-    grid-rows: 1fr 2fr;    /* Top Info, Bottom Logs */
-    grid-gutter: 1;
-    margin: 1;
-}
-
-/* --- Widgets --- */
-
-Panel {
-    background: #161b22;
-    border: solid #30363d;
-    padding: 1;
-}
-
-Panel:focus {
-    border: solid #58a6ff;
-}
-
-.box-title {
-    background: #30363d;
-    color: #ffffff;
-    padding: 0 1;
-    text-align: center;
-    text-style: bold;
-}
-
-/* Matches */
-MatchInfoWidget {
-    row-span: 1;
-    col-span: 1;
-    border: solid #238636; /* Green border for Match */
-    height: 100%;
-}
-
-/* Status / Market */
-StatusWidget {
-    row-span: 1;
-    col-span: 1;
-    border: solid #da3633; /* Red border for Market/Alerts */
-}
-
-/* Logs Area */
-LogPanel {
-    row-span: 1;
-    col-span: 2; /* Full width bottom */
-    border: solid #58a6ff;
-    height: 100%;
-    overflow-y: scroll;
-}
-
-/* Buttons */
-Button {
+#app_view {
     width: 100%;
-    background: #238636;
-    color: #ffffff;
+    height: 100%;
+    align: center middle;
+}
+
+/* ========================================= */
+/* --- ÉCRAN 1 : ACCUEIL --- */
+/* ========================================= */
+
+#startup_center {
+    layout: vertical;
+    width: 100%;
+    height: auto;
+    align: center middle; /* Centre verticalement le bloc global */
+    transition: opacity 300ms;
+}
+
+#startup_center.hidden {
+    display: none;
+    opacity: 0%;
+}
+
+.logo-title {
+    width: 100%;
+    text-align: center;
+    color: $accent;
+    margin-bottom: 2;
+}
+
+/* Le widget Center de Textual prend toute la largeur par défaut */
+Center {
+    width: 100%;
+    height: auto;
+}
+
+/* --- LA "BOÎTE DE COMMANDE" --- */
+.command-box {
+    background: $bg-surface;
+    border-left: thick $accent;
+    padding: 1 2;
+    height: auto;
+    
+    /* LARGEUR DYNAMIQUE CENTRÉE */
+    width: 55%;       /* Un peu plus large pour ressembler à OpenCode */
+    min-width: 60;
+    max-width: 140;
+}
+
+#startup_input {
+    width: 100%;
+    background: transparent;
+    border: none; 
+    color: $text-main;
+    padding: 0;
+    height: 1;
+}
+
+#startup_input:focus {
     border: none;
 }
 
-Button:hover {
-    background: #2ea043;
+.box-subtitle {
+    margin-top: 1;
+    color: $text-dim;
+    text-style: bold;
 }
 
-Button.stop {
-    background: #da3633;
+/* ========================================= */
+/* --- ÉCRAN 2 : DASHBOARD --- */
+/* ========================================= */
+
+#dashboard_view {
+    display: none;
+    width: 100%;
+    height: 100%;
+    layout: horizontal;
+    background: $bg-main;
 }
+
+#dashboard_view.visible {
+    display: block;
+}
+
+#sidebar-container {
+    width: 25;
+    height: 100%;
+    dock: left;
+    background: $bg-surface;
+    border-right: solid $border-color;
+    padding: 1;
+    layout: vertical;
+}
+
+.sidebar-title {
+    color: $text-dim;
+    text-style: bold;
+    border-bottom: solid $border-color;
+    margin-bottom: 1;
+    padding-bottom: 1;
+}
+
+#main-content-container {
+    width: 1fr;
+    height: 100%;
+    layout: vertical;
+}
+
+LogPanel {
+    height: 1fr;
+    background: $bg-main;
+    padding: 1;
+    overflow-y: scroll;
+}
+RichLog {
+    background: transparent;
+    color: $text-main;
+}
+
+AgentStatusItem {
+    layout: horizontal;
+    height: 3;
+    margin-bottom: 1;
+    padding: 0 1;
+    background: $bg-main;
+    border: solid $border-color;
+    align-vertical: middle;
+    color: $text-dim;
+}
+AgentStatusItem.active {
+    border: solid $accent;
+    color: $text-main;
+    background: #2a1a10;
+}
+AgentStatusItem.done {
+    border: solid #4CAF50;
+    color: #4CAF50;
+}
+.agent-name { width: 1fr; text-style: bold; }

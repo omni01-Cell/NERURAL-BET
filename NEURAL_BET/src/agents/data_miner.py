@@ -24,4 +24,14 @@ class DataMinerAgent(BaseAgent):
             raise ValueError("Provider returned no data.")
 
         state.match_data = data
+        
+        # UI Summary Report
+        state.analysis_reports["miner_report"] = f"""
+### 🧪 Reasoning
+Successfully extracted raw metrics from {data.get('meta', {}).get('provider', 'Multi-source')}.
+Targeting match: {data.get('home_team')} vs {data.get('away_team')}.
+
+### 🎯 Verdict
+DATA_READY - Pipeline sequence initialized.
+"""
         return state

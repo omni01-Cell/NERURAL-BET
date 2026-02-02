@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from src.agents.base import BaseAgent, AgentState
 from src.core.llm import LLMFactory
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 class MetricianAgent(BaseAgent):
     """
@@ -46,10 +46,12 @@ class MetricianAgent(BaseAgent):
         </thinking>
 
         Final Output Format:
-        **TECHNICAL METRIC REPORT**
-        - **VARIANCE STATE**: [CRITICAL OVERPERFORMANCE / STABLE / REGRESSION LIKELY]
-        - **LUCK FACTOR**: (Brief explanation)
-        - **DATA VERDICT**: (Max 50 words)
+        ### 🧪 Reasoning
+        - Discuss xG vs Goals variance.
+        - Discuss PPDA and intensity.
+        
+        ### 🎯 Verdict
+        [CRITICAL OVERPERFORMANCE / STABLE / REGRESSION LIKELY] - (Summary)
         """)
 
         # Execute Chain

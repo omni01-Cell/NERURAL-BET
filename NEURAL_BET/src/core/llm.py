@@ -90,6 +90,10 @@ class LLMFactory:
              # Kimi k2.5 via Fireworks -> The "Thinking" Model replacement
              return LLMFactory.get_fireworks_model("accounts/fireworks/models/kimi-k2p5", temperature=0.6)
              
+        elif agent_role == "dispatcher":
+            # Llama 3.1 8b Instant: Ultra fast for command translation
+            return LLMFactory.get_groq_model("llama-3.1-8b-instant", temperature=0.0)
+            
         elif agent_role == "x_factor":
             return LLMFactory.get_groq_model("groq/compound", temperature=0.4)
             

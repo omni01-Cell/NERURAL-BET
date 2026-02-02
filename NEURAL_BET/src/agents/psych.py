@@ -2,8 +2,8 @@
 from src.agents.base import BaseAgent, AgentState
 from src.core.llm import LLMFactory
 from src.core.news_provider import NewsDataProvider, MockNewsProvider
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 class PsychAgent(BaseAgent):
     """

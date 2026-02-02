@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from src.agents.base import BaseAgent, AgentState
 from src.core.llm import LLMFactory
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 class TacticianAgent(BaseAgent):
     """
@@ -45,10 +45,12 @@ class TacticianAgent(BaseAgent):
         </match_data>
 
         Final Output Format:
-        **TACTICAL BREAKDOWN**
-        - **BATTLE OF SYSTEMS**: (Short description)
-        - **THE EXPLOIT**: (The specific tactical hole one team will use)
-        - **VERDICT**: (Tactical advantage: Home / Away / Neutral)
+        ### 🧪 Reasoning
+        - Analyze the "Tactical Fit" and style mismatches.
+        - Discuss specific tactical roles and gaps.
+        
+        ### 🎯 Verdict
+        (Tactical advantage: Home / Away / Neutral) - (Summary)
         """)
 
         chain = prompt | self.llm | StrOutputParser()
