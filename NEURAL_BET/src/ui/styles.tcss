@@ -1,0 +1,92 @@
+/* Cyberpunk / Trader Dark Theme */
+
+Screen {
+    background: #0d1117;
+    color: #c9d1d9;
+}
+
+Header {
+    dock: top;
+    height: 3;
+    background: #161b22;
+    color: #58a6ff;
+    border-bottom: solid #30363d;
+}
+
+Footer {
+    dock: bottom;
+    height: 1;
+    background: #161b22;
+    color: #8b949e;
+}
+
+/* --- Layouts --- */
+
+#main_layout {
+    layout: grid;
+    grid-size: 2;
+    grid-columns: 2fr 1fr; /* 66% Analysis, 33% Market/Status */
+    grid-rows: 1fr 2fr;    /* Top Info, Bottom Logs */
+    grid-gutter: 1;
+    margin: 1;
+}
+
+/* --- Widgets --- */
+
+Panel {
+    background: #161b22;
+    border: solid #30363d;
+    padding: 1;
+}
+
+Panel:focus {
+    border: solid #58a6ff;
+}
+
+.box-title {
+    background: #30363d;
+    color: #ffffff;
+    padding: 0 1;
+    text-align: center;
+    text-style: bold;
+}
+
+/* Matches */
+MatchInfoWidget {
+    row-span: 1;
+    col-span: 1;
+    border: solid #238636; /* Green border for Match */
+    height: 100%;
+}
+
+/* Status / Market */
+StatusWidget {
+    row-span: 1;
+    col-span: 1;
+    border: solid #da3633; /* Red border for Market/Alerts */
+}
+
+/* Logs Area */
+LogPanel {
+    row-span: 1;
+    col-span: 2; /* Full width bottom */
+    border: solid #58a6ff;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+/* Buttons */
+Button {
+    width: 100%;
+    background: #238636;
+    color: #ffffff;
+    border: none;
+}
+
+Button:hover {
+    background: #2ea043;
+}
+
+Button.stop {
+    background: #da3633;
+}
