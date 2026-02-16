@@ -57,8 +57,8 @@ class LLMFactory:
         return ChatOpenAI(
             model=model_name,
             temperature=temperature,
-            openai_api_key=api_key,
-            base_url="https://api.fireworks.ai/inference/v1/chat/completions" # Base URL for OpenAI compat
+            api_key=api_key,  # Fireworks API key
+            base_url="https://api.fireworks.ai/inference/v1"  # NO /chat/completions!
         )
 
     @staticmethod
@@ -82,9 +82,7 @@ class LLMFactory:
             # Groq Compound -> Excellent for critical/contrarian tasks
             return LLMFactory.get_groq_model("groq/compound", temperature=0.7)
         
-        elif agent_role == "value_hunter":
-             # Groq Compound -> Cold logic, high speed
-             return LLMFactory.get_groq_model("groq/compound", temperature=0.0)
+        # REMOVED: value_hunter role (agent deprecated)
 
         elif agent_role == "orchestrator":
              # Kimi k2.5 via Fireworks -> The "Thinking" Model replacement

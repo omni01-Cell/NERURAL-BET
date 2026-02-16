@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from src.core.news_provider import NewsDataProvider
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import os
 import aiohttp
 

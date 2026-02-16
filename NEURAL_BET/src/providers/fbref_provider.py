@@ -1,65 +1,144 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
+"""
+FBRef Provider using soccerdata library.
+Handles anti-bot protections automatically via the maintained soccerdata package.
+"""
 import asyncio
 from typing import Dict, Any, Optional
 from src.core.data_provider import MatchDataProvider
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class FBRefProvider(MatchDataProvider):
     """
-    Provider for FBRef (Possession, Pressing, etc.).
-    Uses Pandas read_html (Scraping).
-    WARNING: High risk of Rate Limiting (429).
+    Provider for FBRef stats using soccerdata library.
+    soccerdata handles headers, sessions, and rate limiting properly.
     """
     
-    LEAGUE_URLS = {
-        "PL": "https://fbref.com/en/comps/9/Premier-League-Stats",
-        "LIGA": "https://fbref.com/en/comps/12/La-Liga-Stats",
-        "SERIE_A": "https://fbref.com/en/comps/11/Serie-A-Stats",
-        "BUNDESLIGA": "https://fbref.com/en/comps/20/Bundesliga-Stats",
-        "L1": "https://fbref.com/en/comps/13/Ligue-1-Stats"
+    LEAGUE_MAP = {
+        "PL": "ENG-Premier League",
+        "LIGA": "ESP-La Liga",
+        "SERIE_A": "ITA-Serie A",
+        "BUNDESLIGA": "GER-Bundesliga",
+        "L1": "FRA-Ligue 1",
+        "CHAMPIONSHIP": "ENG-Championship",
     }
+    
+    def __init__(self):
+        self._fbref_cache: Dict[str, Any] = {}
+    
+    def _get_fbref_instance(self, league: str, season: str = "2024"):
+        """
+        Get or create a cached FBref instance.
+        soccerdata manages session/cookies internally.
+        """
+        import soccerdata as sd
+        
+        cache_key = f"{league}_{season}"
+        if cache_key not in self._fbref_cache:
+            league_code = self.LEAGUE_MAP.get(league, self.LEAGUE_MAP["PL"])
+            self._fbref_cache[cache_key] = sd.FBref(
+                leagues=league_code, 
+                seasons=season
+            )
+        return self._fbref_cache[cache_key]
 
     async def get_team_form(self, team_name: str, last_n: int = 5, league: str = "PL") -> Dict[str, Any]:
         """
-        Attempts to fetch general stats from the specified league table.
-        Args:
-            team_name: Team name (fuzzy matched)
-            last_n: Ignored for now (returns seasonal stats)
-            league: League Code (PL, LIGA, SERIE_A, BUNDESLIGA, L1)
+        Fetch team stats from FBRef using soccerdata.
+        Runs blocking I/O in executor to keep async.
         """
-        url = self.LEAGUE_URLS.get(league, self.LEAGUE_URLS["PL"])
+        loop = asyncio.get_event_loop()
         
-        try:
-            # We run blocking I/O (pandas) in a thread
-            loop = asyncio.get_event_loop()
-            tables = await loop.run_in_executor(None, lambda: pd.read_html(url, match="Regular Season"))
-            
-            if not tables:
-                return {"error": "No tables found on FBRef"}
+        def fetch_stats():
+            try:
+                fb = self._get_fbref_instance(league)
                 
-            df = tables[0]
-            
-            # Simple fuzzy match for team name
-            # FBRef typical names: "Arsenal", "Liverpool", "Manchester City", "Real Madrid", "Inter"
-            row = df[df['Squad'].str.contains(team_name, case=False, na=False)]
-            
-            if row.empty:
-                return {"error": f"Team {team_name} not found in FBRef ({league}) table"}
+                # Get league table (most reliable data point)
+                stats_df = fb.read_league_table()
                 
-            stats = row.iloc[0]
-            
-            return {
-                "source": "FBRef",
-                "league": league,
-                "possession_avg": stats.get('Poss', 50.0), # If column exists
-                "goals_scored": stats.get('GF', 0),
-                "goals_against": stats.get('GA', 0),
-                "league_rank": stats.get('Rk', 0)
-            }
-            
-        except Exception as e:
-            # Fallback for 429 or other errors
-            return {"error": f"FBRef Scraping Failed: {str(e)}"}
+                if stats_df.empty:
+                    return {"error": "No league table data from FBRef"}
+                
+                # Fuzzy match team name (FBRef uses full names like "Arsenal", "Liverpool")
+                mask = stats_df.index.get_level_values('team').str.contains(
+                    team_name, case=False, na=False
+                )
+                team_data = stats_df[mask]
+                
+                if team_data.empty:
+                    return {"error": f"Team '{team_name}' not found in FBRef {league}"}
+                
+                row = team_data.iloc[0]
+                
+                return {
+                    "source": "FBRef (soccerdata)",
+                    "league": league,
+                    "team": team_name,
+                    "matches_played": int(row.get('MP', 0)),
+                    "wins": int(row.get('W', 0)),
+                    "draws": int(row.get('D', 0)),
+                    "losses": int(row.get('L', 0)),
+                    "goals_scored": int(row.get('GF', 0)),
+                    "goals_against": int(row.get('GA', 0)),
+                    "goal_diff": int(row.get('GD', 0)),
+                    "points": int(row.get('Pts', 0)),
+                    "xG": float(row.get('xG', 0.0)),
+                    "xGA": float(row.get('xGA', 0.0)),
+                }
+                
+            except ImportError:
+                return {"error": "soccerdata not installed. Run: pip install soccerdata"}
+            except Exception as e:
+                logger.error(f"FBRef fetch failed: {e}")
+                return {"error": f"FBRef Error: {str(e)}"}
+        
+        return await loop.run_in_executor(None, fetch_stats)
+
+    async def get_team_schedule(self, team_name: str, league: str = "PL") -> Dict[str, Any]:
+        """
+        Get upcoming matches for a team.
+        """
+        loop = asyncio.get_event_loop()
+        
+        def fetch_schedule():
+            try:
+                import pandas as pd
+                fb = self._get_fbref_instance(league)
+                
+                schedule = fb.read_schedule()
+                now = pd.Timestamp.now()
+                
+                # Filter upcoming matches for this team
+                upcoming = schedule[schedule['date'] > now]
+                team_matches = upcoming[
+                    (upcoming['home_team'].str.contains(team_name, case=False, na=False)) |
+                    (upcoming['away_team'].str.contains(team_name, case=False, na=False))
+                ].sort_values('date')
+                
+                if team_matches.empty:
+                    return {"error": f"No upcoming matches for {team_name}"}
+                
+                next_match = team_matches.iloc[0]
+                return {
+                    "source": "FBRef (soccerdata)",
+                    "home_team": next_match['home_team'],
+                    "away_team": next_match['away_team'],
+                    "date": str(next_match['date']),
+                    "league": league,
+                }
+                
+            except Exception as e:
+                logger.error(f"FBRef schedule fetch failed: {e}")
+                return {"error": f"FBRef Schedule Error: {str(e)}"}
+        
+        return await loop.run_in_executor(None, fetch_schedule)
 
     async def get_match_stats(self, match_id: str) -> Optional[Dict[str, Any]]:
+        """
+        FBRef match stats require match-specific URLs.
+        For now, returns None - use get_team_form for aggregate stats.
+        """
         return None

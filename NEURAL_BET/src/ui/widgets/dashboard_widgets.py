@@ -56,8 +56,12 @@ class AgentSidebar(Container):
         yield AgentStatusItem("1. Data Miner", id="status_miner")
         yield AgentStatusItem("2. Metrician", id="status_metrician")
         yield AgentStatusItem("3. Tactician", id="status_tactician")
-        yield AgentStatusItem("4. X-Factor", id="status_xfactor")
-        yield AgentStatusItem("5. Orchestrator", id="status_orchestrator")
+        yield AgentStatusItem("4. Psych Agent", id="status_psych")
+        yield AgentStatusItem("5. X-Factor", id="status_xfactor")
+        yield AgentStatusItem("6. Market Agent", id="status_market")
+        yield AgentStatusItem("7. Devil's Advocate", id="status_devil")
+        yield AgentStatusItem("8. Orchestrator", id="status_orchestrator")
+        yield AgentStatusItem("9. Value Hunter", id="status_value_hunter")
         
         # Placeholder pour ton "autre graphique"
         yield Label("\n[STATISTIQUES]", classes="sidebar-title")

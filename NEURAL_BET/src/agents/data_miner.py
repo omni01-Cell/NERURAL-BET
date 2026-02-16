@@ -12,6 +12,9 @@ class DataMinerAgent(BaseAgent):
     Now enforces a provider via Dependency Injection.
     """
     
+    # No data = no analysis possible. MUST stop pipeline.
+    is_critical: bool = True
+    
     def __init__(self, provider: MatchDataProvider):
         super().__init__(name="Miner_01", role="Data Mining")
         self.provider = provider

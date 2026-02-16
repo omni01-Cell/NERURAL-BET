@@ -11,6 +11,9 @@ class TacticianAgent(BaseAgent):
     Uses valid Reasoner models via Gemini Pro.
     """
     
+    # Tactical analysis is core to prediction
+    is_critical: bool = True
+    
     def __init__(self):
         super().__init__(name="Tactician_Prime", role="Tactical Analyst")
         # Mistral Large for tactical depth
@@ -21,6 +24,11 @@ class TacticianAgent(BaseAgent):
         if "metrician_report" not in state.analysis_reports:
              self.log("Metrician report missing, proceeding with raw data.", level="warning")
         
+        from src.core.schemas import TacticianOutput
+        from langchain_core.output_parsers import PydanticOutputParser
+
+        parser = PydanticOutputParser(pydantic_object=TacticianOutput)
+
         prompt = ChatPromptTemplate.from_template("""
         <persona>
         You are the "Tactician Prime", a master football strategist and former elite manager.
@@ -44,23 +52,20 @@ class TacticianAgent(BaseAgent):
         {match_data}
         </match_data>
 
-        Final Output Format:
-        ### 🧪 Reasoning
-        - Analyze the "Tactical Fit" and style mismatches.
-        - Discuss specific tactical roles and gaps.
-        
-        ### 🎯 Verdict
-        (Tactical advantage: Home / Away / Neutral) - (Summary)
+        <formatting>
+        {format_instructions}
+        </formatting>
         """)
 
-        chain = prompt | self.llm | StrOutputParser()
+        chain = prompt | self.llm | parser
         
         # We pass empty string if metrician report is missing to avoid crash
         metrician_input = state.analysis_reports.get("metrician_report", "No data")
         
         analysis = await chain.ainvoke({
             "match_data": str(state.match_data), 
-            "metrician_report": metrician_input
+            "metrician_report": str(metrician_input),
+            "format_instructions": parser.get_format_instructions()
         })
         
         state.analysis_reports["tactician_report"] = analysis

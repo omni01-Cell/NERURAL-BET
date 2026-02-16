@@ -2,7 +2,8 @@
 from src.agents.base import BaseAgent, AgentState
 from src.core.llm import LLMFactory
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import PydanticOutputParser
+from src.core.schemas import MetricianOutput
 
 class MetricianAgent(BaseAgent):
     """
@@ -10,15 +11,23 @@ class MetricianAgent(BaseAgent):
     Responsibility: Analyze raw stats (xG, PPDA, etc.) to detect luck/variance.
     """
     
+    # Stats analysis is REQUIRED for valid output
+    is_critical: bool = True
+    
     def __init__(self):
         super().__init__(name="Metrician_Alpha", role="Data Analyst")
         # Load the specialized model (Mistral Small)
         self.llm = LLMFactory.create("metrician")
 
     async def process(self, state: AgentState) -> AgentState:
+        # Validation guard: fail-fast if no data
         if not state.match_data:
-            state.errors.append("Metrician: No match data found to analyze.")
-            return state
+            raise ValueError(
+                "Metrician requires match_data but received None. "
+                "DataMiner likely failed upstream."
+            )
+
+        parser = PydanticOutputParser(pydantic_object=MetricianOutput)
 
         # Create the prompt using Anthropic Best Practices
         prompt = ChatPromptTemplate.from_template("""
@@ -41,22 +50,21 @@ class MetricianAgent(BaseAgent):
         {match_data}
         </match_data>
 
+        <formatting>
+        {format_instructions}
+        </formatting>
+
         <thinking>
         Briefly reason step-by-step about the xG vs Goals variance before rendering your report.
         </thinking>
-
-        Final Output Format:
-        ### 🧪 Reasoning
-        - Discuss xG vs Goals variance.
-        - Discuss PPDA and intensity.
-        
-        ### 🎯 Verdict
-        [CRITICAL OVERPERFORMANCE / STABLE / REGRESSION LIKELY] - (Summary)
         """)
 
         # Execute Chain
-        chain = prompt | self.llm | StrOutputParser()
-        analysis = await chain.ainvoke({"match_data": str(state.match_data)})
+        chain = prompt | self.llm | parser
+        analysis = await chain.ainvoke({
+            "match_data": str(state.match_data),
+            "format_instructions": parser.get_format_instructions()
+        })
         
         state.analysis_reports["metrician_report"] = analysis
         return state

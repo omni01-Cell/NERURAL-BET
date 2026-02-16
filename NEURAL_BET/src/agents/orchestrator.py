@@ -12,6 +12,9 @@ class OrchestratorAgent(BaseAgent):
     Uses Gemini 1.5 Pro (Large Context).
     """
     
+    # Final synthesis MUST succeed for valid output
+    is_critical: bool = True
+    
     def __init__(self):
         super().__init__(name="Orchestrator_X", role="Synthesis Loop")
         # Kimi k2.5 for high-level reasoning
@@ -23,6 +26,11 @@ class OrchestratorAgent(BaseAgent):
         tactician_rpt = state.analysis_reports.get("tactician_report", "N/A")
         devil_rpt = state.analysis_reports.get("devils_advocate_report", "N/A")
         
+        from src.core.schemas import OrchestratorOutput
+        from langchain_core.output_parsers import PydanticOutputParser
+
+        parser = PydanticOutputParser(pydantic_object=OrchestratorOutput)
+
         # The Final Prompt with Synthesis Protocol
         prompt = ChatPromptTemplate.from_template("""
         <persona>
@@ -49,20 +57,18 @@ class OrchestratorAgent(BaseAgent):
         Determine the true probability of each outcome (1X2).
         </thinking>
 
-        Final Output Format:
-        **🏛️ THE ORACLE VERDICT**
-        - **CONFIDENCE SCORE**: [XX%]
-        - **THE FLOW**: (A chronological narrative of the most likely scenario)
-        - **DECISIVE FACTOR**: (The one thing that will decide the match)
-        - **FINAL VERDICT**: [HOME WIN / DRAW / AWAY WIN]
+        <formatting>
+        {format_instructions}
+        </formatting>
         """)
 
-        chain = prompt | self.llm | StrOutputParser()
+        chain = prompt | self.llm | parser
         
         analysis = await chain.ainvoke({
-            "metrician_rpt": metrician_rpt,
-            "tactician_rpt": tactician_rpt,
-            "devil_rpt": devil_rpt
+            "metrician_rpt": str(metrician_rpt),
+            "tactician_rpt": str(tactician_rpt),
+            "devil_rpt": str(devil_rpt),
+            "format_instructions": parser.get_format_instructions()
         })
         
         state.analysis_reports["orchestrator_final"] = analysis

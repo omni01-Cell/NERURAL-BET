@@ -82,14 +82,14 @@ Center {
 }
 
 /* ========================================= */
-/* --- ÉCRAN 2 : DASHBOARD --- */
+/* --- ÉCRAN 2 : DASHBOARD (CHAT-BASED) --- */
 /* ========================================= */
 
 #dashboard_view {
     display: none;
     width: 100%;
     height: 100%;
-    layout: horizontal;
+    layout: vertical;
     background: $bg-main;
 }
 
@@ -97,41 +97,107 @@ Center {
     display: block;
 }
 
-#sidebar-container {
-    width: 25;
-    height: 100%;
-    dock: left;
-    background: $bg-surface;
-    border-right: solid $border-color;
-    padding: 1;
-    layout: vertical;
+/* Header row - horizontal layout */
+#header_row {
+    dock: top;
+    width: 100%;
+    height: 1;
+    layout: horizontal;
+    background: #111111;
 }
 
-.sidebar-title {
-    color: $text-dim;
-    text-style: bold;
-    border-bottom: solid $border-color;
-    margin-bottom: 1;
-    padding-bottom: 1;
-}
-
-#main-content-container {
+#header_title {
     width: 1fr;
-    height: 100%;
-    layout: vertical;
+    height: 1;
+    padding: 0 1;
+    color: #ffffff;
+    text-style: bold;
+    background: #222222;
 }
 
-LogPanel {
+#header_brand {
+    width: auto;
+    height: 1;
+    padding: 0 2;
+    text-align: right;
+    color: #444444;
+    background: #111111;
+}
+
+/* Chat area (pleine largeur) */
+#chat_area {
+    width: 100%;
+    height: 1fr;
+    layout: vertical;
+    padding: 0 1;
+}
+
+#chat_messages {
     height: 1fr;
     background: $bg-main;
     padding: 1;
-    overflow-y: scroll;
-}
-RichLog {
-    background: transparent;
-    color: $text-main;
+    scrollbar-size: 1 1;
 }
 
+/* Input wrapper avec assist hint */
+/* Input wrapper est maintenant le BLOC VISUEL */
+#input_wrapper {
+    dock: bottom;
+    height: auto;
+    width: 100%;
+    background: #1e1e1e;
+    border: solid #333333;
+    padding: 0;
+    margin-bottom: 1;
+}
+
+#input_wrapper:focus-within {
+     border: solid #444444; /* Bordure active pour tout le bloc */
+}
+
+/* L'input est transparent dedans */
+#chat_input {
+    width: 100%;
+    height: auto;
+    min-height: 1;
+    margin: 0;
+    padding: 1 1 0 1;
+    background: transparent;
+    border: none;
+}
+
+#chat_input:focus {
+    border: none; /* Pas de bordure interne */
+}
+
+/* Hints container DANS le bloc, en bas */
+#input_hints {
+    height: auto;
+    width: 100%;
+    layout: horizontal;
+    padding: 0 0 0 1; /* Aligné avec le texte */
+    margin-bottom: 0;
+}
+
+#agent_label {
+    margin-top: 0;
+    padding-bottom: 0;
+    color: #3a8fd9;  /* Cyan/Blue */
+    text-style: bold;
+}
+
+/* Ancienne classe assist_hint supprimée, remplacée par agent_label */
+
+/* Footer bar */
+#footer_bar {
+    dock: bottom;
+    height: 1;
+    background: $bg-main;
+    color: $text-dim;
+    padding: 0 2;
+}
+
+/* Agent status items */
 AgentStatusItem {
     layout: horizontal;
     height: 3;
@@ -142,13 +208,27 @@ AgentStatusItem {
     align-vertical: middle;
     color: $text-dim;
 }
+
 AgentStatusItem.active {
     border: solid $accent;
     color: $text-main;
     background: #2a1a10;
 }
+
 AgentStatusItem.done {
     border: solid #4CAF50;
     color: #4CAF50;
 }
-.agent-name { width: 1fr; text-style: bold; }
+
+.agent-name { 
+    width: 1fr; 
+    text-style: bold; 
+}
+
+.sidebar-title {
+    color: $text-dim;
+    text-style: bold;
+    border-bottom: solid $border-color;
+    margin-bottom: 1;
+    padding-bottom: 1;
+}

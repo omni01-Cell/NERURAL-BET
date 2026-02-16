@@ -21,8 +21,38 @@ class ValueHunterAgent(BaseAgent):
             self.log("Skipping Value Hunt - No market data available.", level="warning")
             return state
             
-        orchestrator_verdict = state.analysis_reports.get("orchestrator_final", "N/A")
+        orchestrator_output = state.analysis_reports.get("orchestrator_final")
+        
+        # Check if Orchestrator failed or returned string (e.g. error)
+        if not orchestrator_output or not hasattr(orchestrator_output, "confidence_score"):
+             self.log("Orchestrator output missing or invalid (not an object).", level="error")
+             return state
+
         market_odds = state.market_data
+        
+        # --- Python Math Logic ---
+        confidence = orchestrator_output.confidence_score # float 0.0-1.0
+        prediction = orchestrator_output.winner_prediction # HOME, DRAW, AWAY
+        
+        # Map prediction to odd key
+        odd_key_map = {
+            "HOME": "home_win",
+            "DRAW": "draw",
+            "AWAY": "away_win"
+        }
+        
+        target_odd_key = odd_key_map.get(prediction)
+        target_odd = market_odds.get(target_odd_key, 1.0)
+        
+        # EV Computation: (Probability * Odd) - 1
+        # Probability is our confidence
+        ev_value = (confidence * target_odd) - 1.0
+        
+        # --- LLM Reasoning Portion ---
+        from src.core.schemas import ValueHunterOutput
+        from langchain_core.output_parsers import PydanticOutputParser
+        
+        parser = PydanticOutputParser(pydantic_object=ValueHunterOutput)
         
         prompt = ChatPromptTemplate.from_template("""
         <persona>
@@ -31,35 +61,39 @@ class ValueHunterAgent(BaseAgent):
         </persona>
 
         <inputs>
-        <verdict>{verdict}</verdict>
-        <market_odds>{odds}</market_odds>
+        <verdict_narrative>{narrative}</verdict_narrative>
+        <target_bet>{prediction}</target_bet>
+        <market_odd>{odd}</market_odd>
+        <calculated_ev>{ev}</calculated_ev>
         </inputs>
 
         <instructions>
-        Your goal is to find "Math Value" (Inefficiency) between our Oracle and the Bookmakers.
-        1. **Probability Translation**: Convert the Oracle's narrative into a percentage probability for the primary outcome.
-        2. **Value Formula**: Calculate Value % = (Our_Prob_Decimal * Market_Odd) - 1.
-        3. **Risk/Reward**: Determine if the value is high enough (>5%) to justify a "BUY" (Bet).
+        Your goal is to write the strategic justification for this bet.
+        1. **Analyze the Edge**: We calculated an EV of {ev_formatted}. Explain why this is good (or bad).
+        2. **Risk Assessment**: If EV > 0.05 (5%), recommend a BUY. If EV < 0, recommend NO BET.
+        3. **Stake Sizing**: Suggest a stake (1-10 units) proportional to the edge (Kelly Criterion logic).
+        
+        Note: The EV has ALREADY been calculated. Do not re-calculate it. Trust the input.
         </instructions>
 
-        <thinking>
-        Perform the division and multiplication step-by-step. Compare 1/Odd (Market Prob) with Our Prob.
-        </thinking>
-
-        Final Output Format:
-        **💰 VALUE STRATEGY REPORT**
-        - **RECOMMENDED BET**: [Selection] @ [Odd]
-        - **EXPECTED VALUE (EV)**: [X.XX%]
-        - **EDGE OVER MARKET**: [Explain why the Oracle is smarter than the market here]
-        - **STAKE ADVICE**: [Safe / Aggressive / NO BET]
+        <formatting>
+        {format_instructions}
+        </formatting>
         """)
 
-        chain = prompt | self.llm | StrOutputParser()
+        chain = prompt | self.llm | parser
         
         report = await chain.ainvoke({
-            "verdict": orchestrator_verdict,
-            "odds": str(market_odds)
+            "narrative": orchestrator_output.logic_summary,
+            "prediction": prediction,
+            "odd": target_odd,
+            "ev": ev_value,
+            "ev_formatted": f"{ev_value*100:.2f}%",
+            "format_instructions": parser.get_format_instructions()
         })
+        
+        # Override the EV in the report with our precise python float to ensure accuracy
+        report.ev_percentage = ev_value
         
         state.analysis_reports["value_report"] = report
         return state

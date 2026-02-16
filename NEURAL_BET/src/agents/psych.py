@@ -12,6 +12,9 @@ class PsychAgent(BaseAgent):
     Input: News Headslines, Calendar Context.
     """
     
+    # Enrichment agent: nice-to-have but not required for output
+    is_critical: bool = False
+    
     def __init__(self, news_provider: NewsDataProvider = None):
         super().__init__(name="Freud_01", role="Psychological Profiler")
         self.llm = LLMFactory.create("psych") # Mistral Small for sentiment/text analysis

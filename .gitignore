@@ -1,5 +1,4 @@
 # General
-.agent/
 .vscode/
 __pycache__/
 *.pyc
@@ -11,3 +10,5 @@ build/
 dist/
 *.egg-info/
 .DS_Store
+.agent
+

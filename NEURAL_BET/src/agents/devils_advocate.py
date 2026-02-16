@@ -11,6 +11,9 @@ class DevilsAdvocateAgent(BaseAgent):
     Uses DeepSeek/Llama 70b via Groq.
     """
     
+    # Enrichment agent: nice-to-have but not required for output
+    is_critical: bool = False
+    
     def __init__(self):
         super().__init__(name="Mephisto_01", role="System Critic")
         # Groq Compound for cold logic
