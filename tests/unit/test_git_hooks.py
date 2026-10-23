@@ -109,6 +109,16 @@ def test_unstaged_defect_does_not_block_a_clean_staged_copy(repository):
     )
 
 
+def test_staged_windows_line_endings_are_preserved(repository):
+    candidate = repository / "candidate.py"
+    candidate.write_bytes(b"from pathlib import Path\r\n\r\nanswer = Path.cwd()\r\n")
+    command(
+        ["git", "-c", "core.autocrlf=false", "add", "candidate.py"], repository
+    ).check_returncode()
+    result = command([sys.executable, "scripts/quality_gate.py", "staged"], repository)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 @pytest.mark.parametrize(
     "reference", ["refs/heads/main", "refs/heads/master", "refs/tags/v1.0.0"]
 )

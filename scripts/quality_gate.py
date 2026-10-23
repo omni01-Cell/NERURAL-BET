@@ -60,7 +60,7 @@ def main() -> int:
                 ast.parse(text, filename=name)
                 target = snapshot / path
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(text, encoding="utf-8")
+                target.write_bytes(content)
                 python_files.append(str(target))
         if python_files:
             for operation in (["check"], ["format", "--check"]):

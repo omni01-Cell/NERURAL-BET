@@ -17,3 +17,4 @@
 
 - Additional version tests: invalid/non-increasing versions rejected without metadata changes; higher version changes only the version.
 - Fresh Codex CLI session: FAILED before instruction loading with helper_sandbox_lock_failed / NtCreateFile access denied on the installed .codex/.sandbox-bin runtime. Do not modify installed harness binaries to mask this. The native sandbox profile command probes passed separately.
+- First real pre-push: unit suite passed, then Ruff rejected the temporary snapshot because Windows CRLF was translated twice. Snapshot writes now preserve original bytes. Added a real staged-CRLF regression; all 18 unit tests passed in 16.79s.

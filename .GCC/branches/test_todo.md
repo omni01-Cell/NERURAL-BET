@@ -2,16 +2,11 @@
 
 ## Pending Test Scenarios
 
-### Unit Tests
-- [ ] Scenario: Initial unit test suite execution
-  - Verification: Run unit test runner with coverage
-
-### Integration & Quality Gates
-- [ ] Scenario: Pre-commit secret and formatting check
-  - Verification: Attempt commit with staged files
-- [ ] Scenario: Pre-push full verification
-  - Verification: Run full lint, typecheck, and test suite
-
-### Edge Cases & Regressions
-- [ ] Scenario: Error handling and failure boundaries
-  - Verification: Assert fail-fast behavior on invalid input
+- [x] Offline unit tests, staged index isolation, CRLF preservation and protected push destinations: 18 passed.
+- [x] Commit hook checked the initial configuration commit without bypass.
+- [ ] Full pre-push after the CRLF fix: rerun audit, build and tests before publishing.
+- [ ] Remote pull request: inspect every Actions result and review comment.
+- [ ] Antigravity App: import the tracked project permissions and verify them in the client.
+- [ ] Antigravity IDE: verify documented settings and loaded workspace rule in the client.
+- [ ] Claude Code: native activation remains unverified because its CLI is not on PATH.
+- [ ] Fresh Codex session: resolve or disclose the Windows runtime lock failure; native profile probes alone do not prove instruction bootstrap.
