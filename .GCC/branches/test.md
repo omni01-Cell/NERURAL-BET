@@ -1,5 +1,10 @@
 # Test Execution Log
 ## Verification Runs
+### 2026-10-23 — Antigravity local-permissions correction
+- User clarified that Antigravity does not support the proposed repository-local permissions. Re-read official App permissions/settings docs: project settings and rule strings are documented; neither repository JSON loading nor App JSON import is documented there. Removed the unsupported import instruction and renamed the JSON as manual reference data.
+- The IDE non-workspace access switch affects reading and editing together, so it cannot implement a write-only restriction. Removed that misleading recommendation. No application setting or global configuration was changed; the user chose manual setup.
+- Verified reference JSON types and contents: 23 allow, 0 ask, 36 deny entries, no empty or duplicate rules. The local instruction adapter is unchanged. Global source search found no remaining old filename/import instruction. Independent read-only review confirmed the rename and corrected documentation boundaries.
+
 ### 2026-10-23 — workspace configuration
 - Initial unit suite: 4 passed, 2 UTC deprecation warnings. Replaced utcnow() with datetime.now(UTC).
 - Initial hook test: 4 failed, 7 passed; Windows Git shell not on PATH. Locator now resolves Git usr/bin/sh.exe.

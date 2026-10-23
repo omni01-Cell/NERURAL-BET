@@ -8,8 +8,8 @@
 ## 🛠️ Static Codebase Health
 - Ruff check passed; 71 files formatted; 18 tests passed; real full pre-push checked 98 files; wheel/sdist built; 6 workflows validated; dependency audit reported no known vulnerabilities.
 ## 🚧 Unfinished Work & Technical Failures
-- Fresh nested Codex CLI startup is blocked by Windows sandbox runtime lock access to .codex/.sandbox-bin. Claude CLI is not on PATH. Antigravity App profile import and IDE setting activation require UI verification. No harness installation/binary was modified. Main protection is active and leandre755 has write access.
-- The most recent native sandbox probe also failed during provisioning with helper_sandbox_lock_failed. Earlier permission probes are historical evidence, not a final-profile runtime pass. Desktop-control permission for Antigravity verification was requested and is pending.
+- Fresh nested Codex CLI startup is blocked by Windows sandbox runtime lock access to .codex/.sandbox-bin. Claude CLI is not on PATH. Antigravity App and IDE activation is not verified. No native repository permission loader or App JSON import was established; the tracked App JSON is a manual reference only. No harness installation/binary was modified. Main protection is active and leandre755 has write access.
+- The most recent native sandbox probe also failed during provisioning with helper_sandbox_lock_failed. Earlier permission probes are historical evidence, not a final-profile runtime pass. The user chose to configure Antigravity manually and declined agent desktop control; do not keep asking to take over.
 - All four initial GitHub jobs have no executed steps: "The job was not started because your account is locked due to a billing issue." Account owner must resolve this; do not bypass required checks. Greptile review credits are exhausted; CodeRabbit skipped automatic review. Codex remote review found one P2 in the old launch guide; correction 1b096f9 is published and thread PRRT_kwDORGeUys6vvG9D is verified resolved. The exact module startup/palette/quit sequence ran without a provider request.
 ## 👉 Handover Directives for the Next Agent
 1. Read .GCC/branches/plan_workspace.md.
