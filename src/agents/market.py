@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
+from src.agents.base import AgentState, BaseAgent
 from src.core.market_provider import MarketDataProvider, MockMarketProvider
+
 
 class MarketAgent(BaseAgent):
     """
@@ -8,7 +9,7 @@ class MarketAgent(BaseAgent):
     Responsibility: Gather market data (Cotes) in parallel to the analysis.
     This data IS NOT used by Metrician/Tactician (Double Blind).
     """
-    
+
     def __init__(self, provider: MarketDataProvider = None):
         super().__init__(name="Market_01", role="Odds Scraper")
         if provider:
@@ -22,5 +23,5 @@ class MarketAgent(BaseAgent):
             state.market_data = odds
         else:
             self.log("No odds found for this match.", level="warning")
-            
+
         return state

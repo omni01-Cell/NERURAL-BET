@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
-from src.core.llm import LLMFactory
-from src.core.news_provider import NewsDataProvider, MockNewsProvider
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+from src.agents.base import AgentState, BaseAgent
+from src.core.llm import LLMFactory
+from src.core.news_provider import MockNewsProvider, NewsDataProvider
+
 
 class PsychAgent(BaseAgent):
     """
@@ -11,34 +13,36 @@ class PsychAgent(BaseAgent):
     Responsibility: Analyze the 'Human Factor' (Morale, Fatigue, Stakes).
     Input: News Headslines, Calendar Context.
     """
-    
+
     # Enrichment agent: nice-to-have but not required for output
     is_critical: bool = False
-    
+
     def __init__(self, news_provider: NewsDataProvider = None):
         super().__init__(name="Freud_01", role="Psychological Profiler")
-        self.llm = LLMFactory.create("psych") # Mistral Small for sentiment/text analysis
-        
+        self.llm = LLMFactory.create(
+            "psych"
+        )  # Mistral Small for sentiment/text analysis
+
         if news_provider:
-             self.news_provider = news_provider
+            self.news_provider = news_provider
         else:
-             self.news_provider = MockNewsProvider()
+            self.news_provider = MockNewsProvider()
 
     async def process(self, state: AgentState) -> AgentState:
         match_id = state.match_id
         # Simple parser for MVP "Home_Away"
         try:
-             parts = match_id.split("_")
-             home_team = parts[0]
-             away_team = parts[1]
-        except:
-             home_team = "HomeTeam"
-             away_team = "AwayTeam"
-             
+            parts = match_id.split("_")
+            home_team = parts[0]
+            away_team = parts[1]
+        except (IndexError, AttributeError):
+            home_team = "HomeTeam"
+            away_team = "AwayTeam"
+
         # Fetch News
         home_news = await self.news_provider.get_team_news(home_team)
         away_news = await self.news_provider.get_team_news(away_team)
-        
+
         # Construct Prompt using Professional Standards
         prompt = ChatPromptTemplate.from_template("""
         <persona>
@@ -74,13 +78,15 @@ class PsychAgent(BaseAgent):
         """)
 
         chain = prompt | self.llm | StrOutputParser()
-        
-        analysis = await chain.ainvoke({
-            "home_team": home_team,
-            "away_team": away_team,
-            "home_news": str(home_news),
-            "away_news": str(away_news)
-        })
-        
+
+        analysis = await chain.ainvoke(
+            {
+                "home_team": home_team,
+                "away_team": away_team,
+                "home_news": str(home_news),
+                "away_news": str(away_news),
+            }
+        )
+
         state.analysis_reports["psych_report"] = analysis
         return state

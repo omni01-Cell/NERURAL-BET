@@ -12,3 +12,22 @@ dist/
 .DS_Store
 .agent
 
+
+# --- Coding-Stuff AI & Security Rules ---
+.claude/
+.agents/
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+.codex/.local/
+.coverage
+htmlcov/
+*.whl
+.mypy_cache/
+.coding-stuff/local/

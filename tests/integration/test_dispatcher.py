@@ -1,26 +1,21 @@
 import asyncio
-import os
-import sys
-from pathlib import Path
 
-# Add root to sys.path
-root_dir = Path(__file__).resolve().parent.parent
-sys.path.append(str(root_dir))
+from dotenv import load_dotenv
 
 from src.agents.dispatcher import DispatcherAgent
-from dotenv import load_dotenv
 
 load_dotenv()
 
+
 async def test_dispatcher():
     dispatcher = DispatcherAgent()
-    
+
     test_queries = [
         "Arsenal vs Liverpool tonight",
         "Analysis of the Barcelona game",
-        "Manchester match" # Ambiguous
+        "Manchester match",  # Ambiguous
     ]
-    
+
     print("--- Testing Dispatcher ---")
     for query in test_queries:
         print(f"\nQuery: {query}")
@@ -31,6 +26,7 @@ async def test_dispatcher():
             print(f"Date: {result.date}")
         else:
             print(f"Reasoning: {result.reasoning}")
+
 
 if __name__ == "__main__":
     asyncio.run(test_dispatcher())

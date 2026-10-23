@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
-from src.core.llm import LLMFactory
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+from src.agents.base import AgentState, BaseAgent
+from src.core.llm import LLMFactory
 from src.core.schemas import MetricianOutput
+
 
 class MetricianAgent(BaseAgent):
     """
     The Metrician (Analyst).
     Responsibility: Analyze raw stats (xG, PPDA, etc.) to detect luck/variance.
     """
-    
+
     # Stats analysis is REQUIRED for valid output
     is_critical: bool = True
-    
+
     def __init__(self):
         super().__init__(name="Metrician_Alpha", role="Data Analyst")
         # Load the specialized model (Mistral Small)
@@ -61,10 +63,12 @@ class MetricianAgent(BaseAgent):
 
         # Execute Chain
         chain = prompt | self.llm | parser
-        analysis = await chain.ainvoke({
-            "match_data": str(state.match_data),
-            "format_instructions": parser.get_format_instructions()
-        })
-        
+        analysis = await chain.ainvoke(
+            {
+                "match_data": str(state.match_data),
+                "format_instructions": parser.get_format_instructions(),
+            }
+        )
+
         state.analysis_reports["metrician_report"] = analysis
         return state

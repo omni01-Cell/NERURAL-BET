@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
-from src.core.llm import LLMFactory
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+
+from src.agents.base import AgentState, BaseAgent
+from src.core.llm import LLMFactory
+
 
 class OrchestratorAgent(BaseAgent):
     """
@@ -11,10 +12,10 @@ class OrchestratorAgent(BaseAgent):
     Produce the Final Verdict & Scenario.
     Uses Gemini 1.5 Pro (Large Context).
     """
-    
+
     # Final synthesis MUST succeed for valid output
     is_critical: bool = True
-    
+
     def __init__(self):
         super().__init__(name="Orchestrator_X", role="Synthesis Loop")
         # Kimi k2.5 for high-level reasoning
@@ -25,9 +26,10 @@ class OrchestratorAgent(BaseAgent):
         metrician_rpt = state.analysis_reports.get("metrician_report", "N/A")
         tactician_rpt = state.analysis_reports.get("tactician_report", "N/A")
         devil_rpt = state.analysis_reports.get("devils_advocate_report", "N/A")
-        
-        from src.core.schemas import OrchestratorOutput
+
         from langchain_core.output_parsers import PydanticOutputParser
+
+        from src.core.schemas import OrchestratorOutput
 
         parser = PydanticOutputParser(pydantic_object=OrchestratorOutput)
 
@@ -63,13 +65,15 @@ class OrchestratorAgent(BaseAgent):
         """)
 
         chain = prompt | self.llm | parser
-        
-        analysis = await chain.ainvoke({
-            "metrician_rpt": str(metrician_rpt),
-            "tactician_rpt": str(tactician_rpt),
-            "devil_rpt": str(devil_rpt),
-            "format_instructions": parser.get_format_instructions()
-        })
-        
+
+        analysis = await chain.ainvoke(
+            {
+                "metrician_rpt": str(metrician_rpt),
+                "tactician_rpt": str(tactician_rpt),
+                "devil_rpt": str(devil_rpt),
+                "format_instructions": parser.get_format_instructions(),
+            }
+        )
+
         state.analysis_reports["orchestrator_final"] = analysis
         return state

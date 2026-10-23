@@ -7,9 +7,11 @@ Bienvenue dans **Neural Bet**, votre système d'analyse prédictive de football 
 ## 🛠️ 1. Prérequis & Installation
 
 ### Dépendances Python
-Assurez-vous d'avoir installé les bibliothèques nécessaires :
+Depuis la racine du dépôt, utilisez Python 3.12 dans un environnement virtuel, puis installez le projet et ses dépendances déclarées :
 ```bash
-pip install textual langchain langchain-groq langchain-mistralai langchain-openai aiohttp python-dotenv
+python -m venv .venv
+# Activez .venv, ou utilisez directement son exécutable Python.
+python -m pip install -e .
 ```
 
 ### Clés API (Indispensable)
@@ -28,19 +30,21 @@ Le système repose sur 3 fournisseurs d'IA majeurs. Vous devez remplir votre fic
 Pour lancer le dashboard interactif, exécutez la commande suivante :
 
 ```bash
-python src/tui.py
+python -m src.tui
 ```
 
 ### Commandes de l'Interface :
-*   **`R`** : Lance le pipeline complet d'analyse (Run).
-*   **`Q`** : Quitte l'application et ferme les connexions.
+*   **Saisie puis `Entrée`** : Envoyez une demande de match dans le champ d'accueil, puis répondez aux demandes de confirmation dans la conversation.
+*   **`Ctrl+Q`** : Quitte l'application.
+*   **`Ctrl+D`** : Change le thème.
+*   **`Ctrl+P`** : Ouvre la palette de commandes.
 *   **Souris** : Vous pouvez cliquer sur les panneaux pour faire défiler les logs.
 
 ---
 
 ## 🧠 3. Comprendre le Pipeline "Double-Aveugle"
 
-Lorsque vous appuyez sur `R`, le système exécute les étapes suivantes :
+Après l'identification et la confirmation du match dans la conversation, le système exécute les étapes suivantes :
 
 1.  **Extraction (Data Miner)** : Récupère les stats brutes (xG, forme, etc.).
 2.  **Analyse Sportive (Branche A)** :

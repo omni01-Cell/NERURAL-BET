@@ -65,11 +65,12 @@ Le défi est de connecter le pipeline `asyncio` existant (Agents) à la boucle d
 # Exemple conceptuel
 class NeuralBetApp(App):
     CSS_PATH = "ui/styles.tcss"
+
     def compose(self):
         yield Header()
         yield Grid(
             MatchInfoWidget(id="match_info"),
             LogPanel(id="logs"),
-            ActionPanel(id="actions")
+            ActionPanel(id="actions"),
         )
 ```

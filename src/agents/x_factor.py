@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
-from src.core.llm import LLMFactory
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+from src.agents.base import AgentState, BaseAgent
+from src.core.llm import LLMFactory
+
 
 class XFactorAgent(BaseAgent):
     """
@@ -10,7 +12,7 @@ class XFactorAgent(BaseAgent):
     Responsibility: Analyze finishing efficiency (xGOT vs xG) and NPxG/Sh.
     Detects if a team is over-performing or under-performing.
     """
-    
+
     def __init__(self):
         super().__init__(name="X-Factor_Unit", role="Variance Analyst")
         self.llm = LLMFactory.create("x_factor")
@@ -46,13 +48,12 @@ class XFactorAgent(BaseAgent):
         """)
 
         chain = prompt | self.llm | StrOutputParser()
-        
+
         metrician_input = state.analysis_reports.get("metrician_report", "No data")
-        
-        analysis = await chain.ainvoke({
-            "match_data": str(state.match_data), 
-            "metrician_report": metrician_input
-        })
-        
+
+        analysis = await chain.ainvoke(
+            {"match_data": str(state.match_data), "metrician_report": metrician_input}
+        )
+
         state.analysis_reports["xfactor_report"] = analysis
         return state

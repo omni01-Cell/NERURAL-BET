@@ -15,7 +15,7 @@
 *   **Remédiation :**
 ```python
 # Dans src/agents/data_miner.py
-def __init__(self, provider: MatchDataProvider): # Forcer l'interface
+def __init__(self, provider: MatchDataProvider):  # Forcer l'interface
     super().__init__(name="Miner_01", role="Data Mining")
     self.provider = provider
 ```
@@ -52,14 +52,15 @@ async def safe_execute(self, state: AgentState, func, **kwargs):
 ```python
 from pydantic import field_validator
 
+
 class AgentState(BaseModel):
     match_id: str
-    
-    @field_validator('match_id')
+
+    @field_validator("match_id")
     @classmethod
     def validate_format(cls, v: str) -> str:
         if "_" not in v:
-            raise ValueError('match_id must follow Home_Away_Year format')
+            raise ValueError("match_id must follow Home_Away_Year format")
         return v
 ```
 

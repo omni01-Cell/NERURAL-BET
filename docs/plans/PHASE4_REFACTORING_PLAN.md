@@ -11,7 +11,7 @@
 ---
 
 ## 2. Filet de Sécurité (Safety Net)
-*   **Test de Caractérisation** : S'assurer que `python src/tui.py` se lance sans erreur avant de commencer.
+    *   **Test de Caractérisation** : S'assurer que `python -m src.tui` se lance sans erreur avant de commencer.
 *   **Validation après chaque étape** : Vérifier que le pipeline (Touche `R`) arrive jusqu'au bout.
 
 ---

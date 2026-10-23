@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
-from src.core.llm import LLMFactory
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+
+from src.agents.base import AgentState, BaseAgent
+from src.core.llm import LLMFactory
+
 
 class TacticianAgent(BaseAgent):
     """
@@ -10,10 +11,10 @@ class TacticianAgent(BaseAgent):
     Responsibility: Analyze stylistic matchups (e.g., High Line vs Counter Attack).
     Uses valid Reasoner models via Gemini Pro.
     """
-    
+
     # Tactical analysis is core to prediction
     is_critical: bool = True
-    
+
     def __init__(self):
         super().__init__(name="Tactician_Prime", role="Tactical Analyst")
         # Mistral Large for tactical depth
@@ -22,10 +23,13 @@ class TacticianAgent(BaseAgent):
     async def process(self, state: AgentState) -> AgentState:
         # Dependency Check (Warning only, doesn't stop logic)
         if "metrician_report" not in state.analysis_reports:
-             self.log("Metrician report missing, proceeding with raw data.", level="warning")
-        
-        from src.core.schemas import TacticianOutput
+            self.log(
+                "Metrician report missing, proceeding with raw data.", level="warning"
+            )
+
         from langchain_core.output_parsers import PydanticOutputParser
+
+        from src.core.schemas import TacticianOutput
 
         parser = PydanticOutputParser(pydantic_object=TacticianOutput)
 
@@ -58,15 +62,17 @@ class TacticianAgent(BaseAgent):
         """)
 
         chain = prompt | self.llm | parser
-        
+
         # We pass empty string if metrician report is missing to avoid crash
         metrician_input = state.analysis_reports.get("metrician_report", "No data")
-        
-        analysis = await chain.ainvoke({
-            "match_data": str(state.match_data), 
-            "metrician_report": str(metrician_input),
-            "format_instructions": parser.get_format_instructions()
-        })
-        
+
+        analysis = await chain.ainvoke(
+            {
+                "match_data": str(state.match_data),
+                "metrician_report": str(metrician_input),
+                "format_instructions": parser.get_format_instructions(),
+            }
+        )
+
         state.analysis_reports["tactician_report"] = analysis
         return state

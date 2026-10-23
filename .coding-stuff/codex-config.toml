@@ -1,0 +1,53 @@
+approval_policy = "on-request"
+default_permissions = "neuralbet"
+
+[features]
+network_proxy = true
+
+[permissions.neuralbet]
+description = "Application development with read-only guardrails; Git metadata writable for branch commits."
+extends = ":workspace"
+
+[permissions.neuralbet.filesystem]
+glob_scan_max_depth = 5
+
+[permissions.neuralbet.filesystem.":workspace_roots"]
+".git" = "write"
+".github" = "read"
+".githooks" = "read"
+".gouvernance" = "read"
+".GCC/PROTOCOL.md" = "read"
+"AGENTS.md" = "read"
+"CLAUDE.md" = "read"
+".codex" = "read"
+".claude" = "read"
+".agents" = "read"
+".coding-stuff" = "read"
+"scripts/setup_workspace.py" = "read"
+"scripts/quality_gate.py" = "read"
+"scripts/start_codex.py" = "read"
+"scripts/apply_antigravity_permissions.py" = "read"
+".env" = "deny"
+".env.*" = "deny"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"secrets" = "deny"
+
+[permissions.neuralbet.network]
+enabled = true
+
+[permissions.neuralbet.network.domains]
+"github.com" = "allow"
+"*.github.com" = "allow"
+"githubusercontent.com" = "allow"
+"*.githubusercontent.com" = "allow"
+"pypi.org" = "allow"
+"files.pythonhosted.org" = "allow"
+
+[permissions.neuralbet.filesystem."~/AppData/Roaming/uv/python"]
+"." = "read"
+
+[permissions.neuralbet.filesystem."C:/src/git"]
+"." = "read"
