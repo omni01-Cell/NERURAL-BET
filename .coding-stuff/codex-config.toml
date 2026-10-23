@@ -26,6 +26,7 @@ glob_scan_max_depth = 5
 "scripts/setup_workspace.py" = "read"
 "scripts/quality_gate.py" = "read"
 "scripts/start_codex.py" = "read"
+"scripts/apply_antigravity_permissions.py" = "read"
 ".env" = "deny"
 ".env.*" = "deny"
 "**/.env" = "deny"

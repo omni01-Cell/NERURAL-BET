@@ -55,6 +55,7 @@
       "Edit(/scripts/setup_workspace.py)",
       "Edit(/scripts/quality_gate.py)",
       "Edit(/scripts/start_codex.py)",
+      "Edit(/scripts/apply_antigravity_permissions.py)",
       "Edit(/.git/**)",
       "Read(/.env)",
       "Read(/.env.*)",

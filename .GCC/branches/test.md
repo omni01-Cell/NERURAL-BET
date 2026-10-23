@@ -5,6 +5,13 @@
 - The IDE non-workspace access switch affects reading and editing together, so it cannot implement a write-only restriction. Removed that misleading recommendation. No application setting or global configuration was changed; the user chose manual setup.
 - Verified reference JSON types and contents: 23 allow, 0 ask, 36 deny entries, no empty or duplicate rules. The local instruction adapter is unchanged. Global source search found no remaining old filename/import instruction. Independent read-only review confirmed the rename and corrected documentation boundaries.
 
+### 2026-10-23 — Antigravity native file activation
+- Matched the registered NERURAL-BET project ID against its exact native `folderUri` before writing either settings file.
+- Wrote the 23 allow, 36 deny, 0 ask project rules to that project record. Added 22 absolute file read/write guards to the native shared config so the IDE is protected regardless of its workspace project mapping. The last added rule protects the new permission setup script from agent edits.
+- Preserved all 839 existing shared allow rules and every unrelated global setting and project record. `.git` remains writable for ordinary commits. Original settings were backed up under the task work directory.
+- Read back both files and reran the merge preparation; the candidate bytes exactly matched persisted bytes, proving the merge is idempotent. Runtime denials inside an Antigravity session were not exercised.
+- The reusable repository script has the same dry-run output and preserves both native settings files. Its write rules also protect the installer itself, the instruction files and the permission source.
+
 ### 2026-10-23 — workspace configuration
 - Initial unit suite: 4 passed, 2 UTC deprecation warnings. Replaced utcnow() with datetime.now(UTC).
 - Initial hook test: 4 failed, 7 passed; Windows Git shell not on PATH. Locator now resolves Git usr/bin/sh.exe.
