@@ -3,8 +3,9 @@
 NEURAL BET CLI Entry Point.
 Allows launching the TUI from anywhere with: neuralbet
 """
-import sys
+
 import os
+import sys
 
 # Ensure the project root is in path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,7 +16,7 @@ if project_root not in sys.path:
 def main():
     """CLI entry point - launches the TUI."""
     from src.tui import NeuralBetApp
-    
+
     app = NeuralBetApp()
     app.run()
 
@@ -23,8 +24,9 @@ def main():
 def run_pipeline():
     """Alternative entry point - runs the headless pipeline."""
     import asyncio
+
     from src.main import main as pipeline_main
-    
+
     asyncio.run(pipeline_main())
 
 

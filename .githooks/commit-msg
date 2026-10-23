@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+if ! head -n 1 "$1" | grep -Eq '^(feat|fix|chore|docs|refactor|test|ci|perf|build|style|revert)(\([a-zA-Z0-9._/-]+\))?!?: .{3,}$'; then
+    echo 'Message invalide : utiliser par exemple fix(provider): handle an unavailable match.' >&2
+    exit 1
+fi

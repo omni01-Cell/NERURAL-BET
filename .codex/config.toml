@@ -1,0 +1,2 @@
+approval_policy = "on-request"
+# Load the versioned permission profile through python scripts/start_codex.py.

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-from src.agents.base import BaseAgent, AgentState
-from src.core.llm import LLMFactory
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+from src.agents.base import AgentState, BaseAgent
+from src.core.llm import LLMFactory
+
 
 class DevilsAdvocateAgent(BaseAgent):
     """
@@ -10,10 +12,10 @@ class DevilsAdvocateAgent(BaseAgent):
     Responsibility: Destroy the consensus. Find the 'Black Swan'.
     Uses DeepSeek/Llama 70b via Groq.
     """
-    
+
     # Enrichment agent: nice-to-have but not required for output
     is_critical: bool = False
-    
+
     def __init__(self):
         super().__init__(name="Mephisto_01", role="System Critic")
         # Groq Compound for cold logic
@@ -23,7 +25,7 @@ class DevilsAdvocateAgent(BaseAgent):
         # We need the previous analyses to criticize them
         metrician_report = state.analysis_reports.get("metrician_report", "No Data")
         tactician_report = state.analysis_reports.get("tactician_report", "No Data")
-        
+
         # The System Prompt with Ruin Protocol
         prompt = ChatPromptTemplate.from_template("""
         <persona>
@@ -60,12 +62,14 @@ class DevilsAdvocateAgent(BaseAgent):
         """)
 
         chain = prompt | self.llm | StrOutputParser()
-        
-        analysis = await chain.ainvoke({
-            "match_data": str(state.match_data),
-            "metrician_report": metrician_report,
-            "tactician_report": tactician_report
-        })
-        
+
+        analysis = await chain.ainvoke(
+            {
+                "match_data": str(state.match_data),
+                "metrician_report": metrician_report,
+                "tactician_report": tactician_report,
+            }
+        )
+
         state.analysis_reports["devils_advocate_report"] = analysis
         return state
