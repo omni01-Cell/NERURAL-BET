@@ -39,6 +39,7 @@
       "write_file(.coding-stuff)",
       "write_file(scripts/setup_workspace.py)",
       "write_file(scripts/quality_gate.py)",
+      "write_file(scripts/start_codex.py)",
       "write_file(.git/)",
       "read_file(.env)",
       "read_file(secrets/)",

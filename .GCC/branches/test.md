@@ -18,3 +18,8 @@
 - Additional version tests: invalid/non-increasing versions rejected without metadata changes; higher version changes only the version.
 - Fresh Codex CLI session: FAILED before instruction loading with helper_sandbox_lock_failed / NtCreateFile access denied on the installed .codex/.sandbox-bin runtime. Do not modify installed harness binaries to mask this. The native sandbox profile command probes passed separately.
 - First real pre-push: unit suite passed, then Ruff rejected the temporary snapshot because Windows CRLF was translated twice. Snapshot writes now preserve original bytes. Added a real staged-CRLF regression; all 18 unit tests passed in 16.79s.
+- Corrected real pre-push: 18 passed in 11.64s; Ruff check and formatting passed; audit reported no known vulnerabilities; wheel and sdist built; full gate checked 98 files. Branch published normally, without bypass flags.
+- PR #1 opened: https://github.com/omni01-Cell/NERURAL-BET/pull/1. GitHub CI has no executed steps: "The job was not started because your account is locked due to a billing issue." Required CI remains enforced.
+- PR discussion read in full: Greptile has no review credits; CodeRabbit skipped automatic review; Codex remote review is running. No inline review comments or submitted reviews were present at this observation.
+- Final static recheck: Ruff passed, 71 files formatted, six workflows compliant. setup_workspace.py restored the updated local Claude adapter and confirmed three active hooks.
+- Latest native Codex probe of the added start_codex.py protection could not execute: the same helper_sandbox_lock_failed runtime error now blocks sandbox provisioning. Earlier native probes passed; do not extrapolate them to a runtime pass for the final profile.

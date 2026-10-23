@@ -58,7 +58,7 @@ jobs:
           protected=false
           while IFS= read -r -d '' path; do
             case "$path" in
-              .github/workflows/*|.github/scripts/*|.github/CODEOWNERS|AGENTS.md|.gouvernance/*|AUTONOMY.md|agent-control-plane/*|.claude/*|.cursor/*|.agents/*|.devin/*|.windsurf/*|githooks/*|.githooks/*|CLAUDE.md|.GCC/PROTOCOL.md|.coding-stuff/*|.codex/*|setup.sh|setup.ps1)
+              .github/*|AGENTS.md|.gouvernance/*|.claude/*|.agents/*|.githooks/*|CLAUDE.md|.GCC/PROTOCOL.md|.coding-stuff/*|.codex/*|scripts/setup_workspace.py|scripts/quality_gate.py|scripts/start_codex.py)
                 protected=true
                 ;;
             esac
